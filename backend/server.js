@@ -33,18 +33,6 @@ const methodSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  syntax: {
-    type: String,
-    required: true
-  },
-  returnValue: {
-    type: String,
-    required: true
-  },
-  parameters: [{
-    name: String,
-    description: String
-  }],
   examples: [{
     code: String,
     output: String

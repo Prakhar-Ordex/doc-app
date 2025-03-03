@@ -154,39 +154,6 @@ function MethodDetail() {
         <ReactMarkdown>{method.description}</ReactMarkdown>
       </div>
 
-      {method.syntax && (
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">Syntax</h2>
-          <div className="bg-gray-50 p-4 rounded-md border border-gray-300">
-            <code className="text-lg">{method.syntax}</code>
-          </div>
-        </div>
-      )}
-
-      {method.parameters && method.parameters.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">Parameters</h2>
-          <div className="bg-gray-50 p-4 rounded-md border border-gray-300">
-            <ul className="list-disc pl-5">
-              {method.parameters.map((param, index) => (
-                <li key={index} className="mb-2">
-                  <code className="font-bold">{param.name}</code> - {param.description}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
-
-      {method.returnValue && (
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">Return Value</h2>
-          <div className="bg-gray-50 p-4 rounded-md border border-gray-300">
-            <ReactMarkdown>{method.returnValue}</ReactMarkdown>
-          </div>
-        </div>
-      )}
-
       <h2 className="text-2xl font-bold mb-4">Examples</h2>
       {method?.examples?.map((example, index) => (
         <div key={index} className="mb-8 border border-gray-300 rounded-md overflow-hidden">
@@ -225,10 +192,7 @@ function Admin() {
     name: '',
     category: 'Array',
     description: '',
-    syntax: '',
-    returnValue: '',
-    examples: [{ code: '', output: '' }],
-    parameters: [{ name: '', description: '' }]
+    examples: [{ code: '', output: '' }]
   });
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -265,35 +229,16 @@ function Admin() {
     setFormData(prev => ({ ...prev, examples: newExamples }));
   };
 
-  const handleParameterChange = (index, field, value) => {
-    const newParams = [...formData.parameters];
-    newParams[index][field] = value;
-    setFormData(prev => ({ ...prev, parameters: newParams }));
-  };
-
   const removeExample = (index) => {
     const newExamples = [...formData.examples];
     newExamples.splice(index, 1);
     setFormData(prev => ({ ...prev, examples: newExamples }));
   };
 
-  const removeParameter = (index) => {
-    const newParams = [...formData.parameters];
-    newParams.splice(index, 1);
-    setFormData(prev => ({ ...prev, parameters: newParams }));
-  };
-
   const addExample = () => {
     setFormData(prev => ({
       ...prev,
       examples: [...prev.examples, { code: '', output: '' }]
-    }));
-  };
-
-  const addParameter = () => {
-    setFormData(prev => ({
-      ...prev,
-      parameters: [...prev.parameters, { name: '', description: '' }]
     }));
   };
 
@@ -374,10 +319,7 @@ function Admin() {
       name: '',
       category: 'Array',
       description: '',
-      syntax: '',
-      returnValue: '',
-      examples: [{ code: '', output: '' }],
-      parameters: [{ name: '', description: '' }]
+      examples: [{ code: '', output: '' }]
     });
     setEditingId(null);
     setError(null);
@@ -433,71 +375,6 @@ function Admin() {
             className="w-full p-3 border border-gray-300 rounded-md font-inherit text-base min-h-32"
             rows="6"
           />
-        </div>
-
-        <div className="mb-6">
-          <label className="block font-bold mb-2">Syntax:</label>
-          <input
-            type="text"
-            name="syntax"
-            value={formData.syntax}
-            onChange={handleChange}
-            required
-            className="w-full p-3 border border-gray-300 rounded-md font-inherit text-base"
-          />
-        </div>
-
-        <div className="mb-6">
-          <label className="block font-bold mb-2">Return Value:</label>
-          <textarea
-            name="returnValue"
-            value={formData.returnValue}
-            onChange={handleChange}
-            required
-            className="w-full p-3 border border-gray-300 rounded-md font-inherit text-base min-h-32"
-            rows="4"
-          />
-        </div>
-
-        <div className="mb-8">
-          <h3 className="text-xl font-semibold mb-4">Parameters</h3>
-          {formData.parameters.map((param, idx) => (
-            <div key={idx} className="mb-4 p-4 border border-gray-300 rounded-md">
-              <div className="flex justify-between mb-2">
-                <h4 className="text-lg font-medium">Parameter #{idx + 1}</h4>
-                <button 
-                  type="button" 
-                  onClick={() => removeParameter(idx)}
-                  className="text-red-500 hover:text-red-700"
-                >
-                  Remove
-                </button>
-              </div>
-              <div className="flex flex-col gap-2">
-                <input
-                  type="text"
-                  placeholder="Parameter Name"
-                  value={param.name}
-                  onChange={e => handleParameterChange(idx, 'name', e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-md font-inherit text-base"
-                />
-                <textarea
-                  placeholder="Parameter Description"
-                  value={param.description}
-                  onChange={e => handleParameterChange(idx, 'description', e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-md font-inherit text-base"
-                  rows="3"
-                />
-              </div>
-            </div>
-          ))}
-          <button 
-            type="button" 
-            onClick={addParameter} 
-            className="bg-blue-700 text-white py-2 px-4 rounded-md border-none cursor-pointer"
-          >
-            Add Parameter
-          </button>
         </div>
 
         <div className="mb-8">
