@@ -2,8 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
-
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -35,6 +33,18 @@ const methodSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  syntax: {
+    type: String,
+    required: true
+  },
+  returnValue: {
+    type: String,
+    required: true
+  },
+  parameters: [{
+    name: String,
+    description: String
+  }],
   examples: [{
     code: String,
     output: String
@@ -67,6 +77,9 @@ app.get('/api/methods/:id', async (req, res) => {
     res.json(method);
   } catch (err) {
     console.error("Error fetching method:", err);
+    if (err.kind === 'ObjectId') {
+      return res.status(404).json({ message: "Invalid method ID format" });
+    }
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -81,10 +94,12 @@ app.post('/api/methods', async (req, res) => {
     console.error("Error creating method:", err);
     if (err.code === 11000) {
       // Duplicate key error
-      res.status(400).json({ message: "A method with this name already exists" });
-    } else {
-      res.status(500).json({ message: "Server error" });
+      return res.status(400).json({ message: "A method with this name already exists" });
+    } else if (err.name === 'ValidationError') {
+      // Validation error
+      return res.status(400).json({ message: err.message });
     }
+    res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -104,6 +119,15 @@ app.put('/api/methods/:id', async (req, res) => {
     res.json(method);
   } catch (err) {
     console.error("Error updating method:", err);
+    if (err.code === 11000) {
+      // Duplicate key error
+      return res.status(400).json({ message: "A method with this name already exists" });
+    } else if (err.name === 'ValidationError') {
+      // Validation error
+      return res.status(400).json({ message: err.message });
+    } else if (err.kind === 'ObjectId') {
+      return res.status(404).json({ message: "Invalid method ID format" });
+    }
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -120,8 +144,22 @@ app.delete('/api/methods/:id', async (req, res) => {
     res.json({ message: "Method deleted successfully" });
   } catch (err) {
     console.error("Error deleting method:", err);
+    if (err.kind === 'ObjectId') {
+      return res.status(404).json({ message: "Invalid method ID format" });
+    }
     res.status(500).json({ message: "Server error" });
   }
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: "Something went wrong on the server" });
+});
+
+// Handle 404 routes
+app.use((req, res) => {
+  res.status(404).json({ message: "Route not found" });
 });
 
 // Start server
